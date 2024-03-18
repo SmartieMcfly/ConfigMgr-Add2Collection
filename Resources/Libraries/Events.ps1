@@ -23,7 +23,7 @@
 })
 
 $UI.SelectCollection.Add_Click({
-    . "$Source\bin\Show-CollectionsTreeView.ps1"
+    . "$(Join-Path $ResourcePath 'Show-CollectionsTreeView.ps1')"
     $UI.MembersGrid.ItemsSource = $null
 })
 
@@ -38,7 +38,7 @@ $UI.Populate.Add_Click({
         New-WPFMessageBox -Title "SQL Error" -Content $Customerror -BorderThickness 1 -BorderBrush Red -Sound 'Windows Error' -TitleBackground Red -TitleTextForeground GhostWhite -TitleFontWeight Bold -TitleFontSize 20
         Return
     }
-    
+
 })
 
 $Text = "Enter or paste resource names here, each resource on a new line.`nFor devices, add the computer name. For users or user groups, add the user or group name (no domain prefix required)."
@@ -83,7 +83,7 @@ $UI.AddResources.Add_Click({
     $UI.StatusBarData[3] = 0
     $UI.StatusBarData[4] = 0
     $UI.SessionData[3] = "True"
-    
+
     Try
     {
         Add-ResourcesToCollection -ErrorAction Stop
