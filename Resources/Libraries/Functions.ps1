@@ -1,5 +1,5 @@
 ﻿# Function to get collection details
-Function Populate-CollectionInfo {
+Function Get-CollectionInfo {
     [CmdletBinding()]
 
     $Query = "
@@ -24,7 +24,7 @@ Function Populate-CollectionInfo {
 }
 
 # Function to get the current collection membership
-Function Populate-Members {
+Function Get-CollectionMember {
     [CmdletBinding()]
 
     $Query = "
@@ -422,7 +422,7 @@ Function Add-ResourcesToCollection {
 }
 
 # Function to display a custom messagebox
-Function New-WPFMessageBox {
+Function Show-WpfMessageBox {
 
     # Define Parameters
     [CmdletBinding()]
@@ -869,7 +869,7 @@ Function New-WPFMessageBox {
 }
 
 # Function to create the required registry keys
-Function Create-RegistryKeys {
+Function Add-RegSetting {
     If (!(Test-Path -Path $UI.SessionData[4])) {
         New-Item -Path $UI.SessionData[4] -Force | Out-Null
         New-ItemProperty -Path $UI.SessionData[4] -Name SQLServer -Value '' | Out-Null
@@ -879,7 +879,8 @@ Function Create-RegistryKeys {
 }
 
 # Function to update registry keys
-Function Update-Registry {
+Function Set-RegSetting {
+    [CmdletBinding(SupportsShouldProcess = $true)]
     param($SQLServer, $Database, $AdminUIServer)
 
     Set-ItemProperty -Path $UI.SessionData[4] -Name SQLServer -Value $SQLServer | Out-Null
@@ -888,24 +889,24 @@ Function Update-Registry {
 }
 
 # Function to read the registry keys
-Function Read-Registry {
+Function Read-RegSetting {
     $UI.SessionData[0] = Get-ItemProperty -Path $UI.SessionData[4] -Name SQLServer | Select-Object -ExpandProperty SQLServer
     $UI.SessionData[1] = Get-ItemProperty -Path $UI.SessionData[4] -Name Database | Select-Object -ExpandProperty Database
     $UI.SessionData[2] = Get-ItemProperty -Path $UI.SessionData[4] -Name AdminUIServer | Select-Object -ExpandProperty AdminUIServer
 
     # Prompt user to enter the SQL Server and Database info if not yet populated
     If (!($ui.SessionData[0]) -or !($UI.SessionData[1]) -or !($UI.SessionData[2])) {
-        Get-Settings
+        Show-SettingsView
     }
 }
 
 # Function to display settings window
-Function Get-Settings {
+Function Show-SettingsView {
 
     # Create the Settings window
-    [XML]$Xaml3 = [System.IO.File]::ReadAllLines("$(Join-Path $ViewPath 'Settings.xaml')")
-    $UI.SettingsWindow = [Windows.Markup.XamlReader]::Load((New-Object -TypeName System.Xml.XmlNodeReader -ArgumentList $xaml3))
-    $xaml3.SelectNodes("//*[@*[contains(translate(name(.),'n','N'),'Name')]]") | ForEach-Object -Process {
+    [XML]$SettingsXaml = [System.IO.File]::ReadAllLines("$(Join-Path $ViewPath 'Settings.xaml')")
+    $UI.SettingsWindow = [Windows.Markup.XamlReader]::Load((New-Object -TypeName System.Xml.XmlNodeReader -ArgumentList $Settingsxaml))
+    $Settingsxaml.SelectNodes("//*[@*[contains(translate(name(.),'n','N'),'Name')]]") | ForEach-Object -Process {
         $UI.$($_.Name) = $UI.SettingsWindow.FindName($_.Name)
     }
     $UI.SettingsWindow.Icon = "$(Join-Path $AssetPath 'Settings.png')"
@@ -916,10 +917,10 @@ Function Get-Settings {
     $UI.Btn_SettingsOK.Add_Click({
 
             # Update the registry with the [new] values
-            Update-Registry -SQLServer $UI.SQLServer.text -Database $UI.Database.text -AdminUIServer $UI.AdminUIServer.Text
+            Set-RegSetting -SQLServer $UI.SQLServer.text -Database $UI.Database.text -AdminUIServer $UI.AdminUIServer.Text
 
             # Read the registry again to make sure valid values are set
-            Read-Registry
+            Read-RegSetting
 
             # Close the Settings window
             $UI.SettingsWindow.Close()
@@ -931,12 +932,12 @@ Function Get-Settings {
 }
 
 # Function to display "About" window
-Function Display-About {
+Function Show-AboutView {
 
     # Create the Display window
-    [XML]$Xaml4 = [System.IO.File]::ReadAllLines("$(Join-Path $ViewPath 'About.xaml')")
-    $UI.AboutWindow = [Windows.Markup.XamlReader]::Load((New-Object -TypeName System.Xml.XmlNodeReader -ArgumentList $xaml4))
-    $xaml4.SelectNodes("//*[@*[contains(translate(name(.),'n','N'),'Name')]]") | ForEach-Object -Process {
+    [XML]$AboutXaml = [System.IO.File]::ReadAllLines("$(Join-Path $ViewPath 'About.xaml')")
+    $UI.AboutWindow = [Windows.Markup.XamlReader]::Load((New-Object -TypeName System.Xml.XmlNodeReader -ArgumentList $Aboutxaml))
+    $Aboutxaml.SelectNodes("//*[@*[contains(translate(name(.),'n','N'),'Name')]]") | ForEach-Object -Process {
         $UI.$($_.Name) = $UI.AboutWindow.FindName($_.Name)
     }
     $UI.AboutWindow.Icon = "$(Join-Path $AssetPath 'information-outline.png')"
@@ -954,14 +955,13 @@ Function Display-About {
     $null = $UI.AboutWindow.ShowDialog()
 }
 
-
 # Function to display "Help" window
-Function Display-Help {
+Function Show-HelpView {
 
     # Create the Help window
-    [XML]$Xaml5 = [System.IO.File]::ReadAllLines("$(Join-Path $ViewPath 'Help.xaml')")
-    $UI.HelpWindow = [Windows.Markup.XamlReader]::Load((New-Object -TypeName System.Xml.XmlNodeReader -ArgumentList $xaml5))
-    $xaml5.SelectNodes("//*[@*[contains(translate(name(.),'n','N'),'Name')]]") | ForEach-Object -Process {
+    [XML]$HelpXaml = [System.IO.File]::ReadAllLines("$(Join-Path $ViewPath 'Help.xaml')")
+    $UI.HelpWindow = [Windows.Markup.XamlReader]::Load((New-Object -TypeName System.Xml.XmlNodeReader -ArgumentList $Helpxaml))
+    $Helpxaml.SelectNodes("//*[@*[contains(translate(name(.),'n','N'),'Name')]]") | ForEach-Object -Process {
         $UI.$($_.Name) = $UI.HelpWindow.FindName($_.Name)
     }
     $UI.HelpWindow.Icon = "$(Join-Path $AssetPath 'help-circle.png')"
@@ -969,8 +969,8 @@ Function Display-Help {
     $UI.HelpWindow.Owner = $UI.Window
 
     # Read the FlowDocument content
-    [XML]$HelpFlow = [System.IO.File]::ReadAllLines("$(Join-Path $ViewPath 'HelpFlowDocument.xaml')")
-    $Reader = New-Object -TypeName System.Xml.XmlNodeReader -ArgumentList $HelpFlow
+    [XML]$HelpFlowXaml = [System.IO.File]::ReadAllLines("$(Join-Path $ViewPath 'HelpFlowDocument.xaml')")
+    $Reader = New-Object -TypeName System.Xml.XmlNodeReader -ArgumentList $HelpFlowXaml
     $XamlDoc = [System.Windows.Markup.XamlReader]::Load($Reader)
 
     # Add the FlowDocument to the Window
@@ -991,9 +991,62 @@ Function Display-Help {
     $UI.HelpWindow.ShowDialog()
 }
 
+# Function to display a notification tip
+function Show-BalloonTip {
+
+    [CmdletBinding()]
+    param
+    (
+        [Parameter(Mandatory = $true)]
+        $Text,
+
+        [Parameter(Mandatory = $true)]
+        $Title,
+
+        [ValidateSet('None', 'Info', 'Warning', 'Error')]
+        $Icon = 'Info',
+        $Timeout = 30000,
+        $UI
+    )
+
+    Add-Type -AssemblyName System.Windows.Forms
+
+    $Form = New-Object System.Windows.Forms.Form
+    $Form.ShowInTaskbar = $false
+    $Form.WindowState = 'Minimized'
+
+    $balloon = New-Object System.Windows.Forms.NotifyIcon
+
+    $path = Get-Process -Id $pid | Select-Object -ExpandProperty Path
+    $balloon.Icon = [System.Drawing.Icon]::ExtractAssociatedIcon($path)
+    $balloon.BalloonTipIcon = $Icon
+    $balloon.BalloonTipText = $Text
+    $balloon.BalloonTipTitle = $Title
+    $balloon.Visible = $true
+
+    $Balloon.Add_BalloonTipClicked({
+            $UI.Host.Runspace.Events.GenerateEvent('InvokeUpdate', $null, $null, 'InvokeUpdate')
+            $This.Dispose()
+            $Form.Dispose()
+        })
+
+    $Balloon.Add_BalloonTipClosed({
+            $This.Dispose()
+            $Form.Dispose()
+        })
+
+    $balloon.ShowBalloonTip($Timeout)
+
+    $Form.ShowDialog()
+
+    # Can run as app but generate event won't work (different context)
+    #$App = [System.Windows.Application]::new()
+    #$app.Run($Form)
+
+}
 
 # Function to check if a new version has been released
-Function Check-CurrentVersion {
+Function Test-UpdateAvailable {
     Param($UI)
 
     # Download XML from internet
@@ -1047,60 +1100,5 @@ Function Check-CurrentVersion {
     If (Test-Path -Path "$env:USERPROFILE\AppData\Local\Temp\Add2Collection.xml") {
         Remove-Item -Path "$env:USERPROFILE\AppData\Local\Temp\Add2Collection.xml" -Force -Confirm:$false
     }
-
-}
-
-
-# Function to display a notification tip
-function Show-BalloonTip {
-
-    [CmdletBinding(SupportsShouldProcess = $true)]
-    param
-    (
-        [Parameter(Mandatory = $true)]
-        $Text,
-
-        [Parameter(Mandatory = $true)]
-        $Title,
-
-        [ValidateSet('None', 'Info', 'Warning', 'Error')]
-        $Icon = 'Info',
-        $Timeout = 30000,
-        $UI
-    )
-
-    Add-Type -AssemblyName System.Windows.Forms
-
-    $Form = New-Object System.Windows.Forms.Form
-    $Form.ShowInTaskbar = $false
-    $Form.WindowState = 'Minimized'
-
-    $balloon = New-Object System.Windows.Forms.NotifyIcon
-
-    $path = Get-Process -Id $pid | Select-Object -ExpandProperty Path
-    $balloon.Icon = [System.Drawing.Icon]::ExtractAssociatedIcon($path)
-    $balloon.BalloonTipIcon = $Icon
-    $balloon.BalloonTipText = $Text
-    $balloon.BalloonTipTitle = $Title
-    $balloon.Visible = $true
-
-    $Balloon.Add_BalloonTipClicked({
-            $UI.Host.Runspace.Events.GenerateEvent('InvokeUpdate', $null, $null, 'InvokeUpdate')
-            $This.Dispose()
-            $Form.Dispose()
-        })
-
-    $Balloon.Add_BalloonTipClosed({
-            $This.Dispose()
-            $Form.Dispose()
-        })
-
-    $balloon.ShowBalloonTip($Timeout)
-
-    $Form.ShowDialog()
-
-    # Can run as app but generate event won't work (different context)
-    #$App = [System.Windows.Application]::new()
-    #$app.Run($Form)
 
 }

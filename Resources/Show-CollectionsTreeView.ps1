@@ -23,7 +23,7 @@ Function Script:Query-Collections {
     Param($ObjectPath,$CollectionType)
 
     $Query = "
-    Select CollectionName 
+    Select CollectionName
     from v_Collections
     where ObjectPath = '$ObjectPath'
     and CollectionType = '$CollectionType'
@@ -60,7 +60,7 @@ Function Query-RBACPermissions {
         }
         Catch {}
         }
-    
+
     # Match any SIDs in RBAC to SIDs in the users claim
     $AdminIDs = @()
     Foreach ($Claim in $Claims)
@@ -141,7 +141,7 @@ Function Add-TreeViewItem {
     }
 
     # Add to treeView
-   
+
     [void]$Parent.AddChild($TreeViewItem)
 
     Return $TreeViewItem
@@ -154,14 +154,14 @@ Try
 Catch
 {
     $Customerror = $_.Exception.Message.Replace('"',"'")
-    New-WPFMessageBox -Title "SQL Error" -Content $Customerror -BorderThickness 1 -BorderBrush Red -Sound 'Windows Error' -TitleBackground Red -TitleTextForeground GhostWhite -TitleFontWeight Bold -TitleFontSize 20
+    Show-WpfMessageBox -Title "SQL Error" -Content $Customerror -BorderThickness 1 -BorderBrush Red -Sound 'Windows Error' -TitleBackground Red -TitleTextForeground GhostWhite -TitleFontWeight Bold -TitleFontSize 20
     Return
 }
 $script:RBAC_CollectionIDs = "'" + ($Results.CollectionID -join "','") + "'"
 
 
 #region WPFWindow
-# Create the WPF window 
+# Create the WPF window
 Add-Type -AssemblyName PresentationFramework
 
 $Window = New-Object System.Windows.Window
@@ -268,13 +268,13 @@ $FilterBox.Add_LostFocus({
 $FilterBox.Add_TextChanged({
     If ($This.Text -ne "Filter...")
     {
-        [System.Windows.Data.CollectionViewSource]::GetDefaultView($List.Items).Filter = [Predicate[Object]]{             
+        [System.Windows.Data.CollectionViewSource]::GetDefaultView($List.Items).Filter = [Predicate[Object]]{
             Try {
                 $args[0] -match [regex]::Escape($This.Text)
             } Catch {
                 $True
             }
-        } 
+        }
     }
 })
 $DockPanel.AddChild($FilterBox)
@@ -328,7 +328,7 @@ $TreeView.Add_SelectedItemChanged({
             Catch
             {
                 $Customerror = $_.Exception.Message.Replace('"',"'")
-                New-WPFMessageBox -Title "SQL Error" -Content $Customerror -BorderThickness 1 -BorderBrush Red -Sound 'Windows Error' -TitleBackground Red -TitleTextForeground GhostWhite -TitleFontWeight Bold -TitleFontSize 20
+                Show-WpfMessageBox -Title "SQL Error" -Content $Customerror -BorderThickness 1 -BorderBrush Red -Sound 'Windows Error' -TitleBackground Red -TitleTextForeground GhostWhite -TitleFontWeight Bold -TitleFontSize 20
                 Return
             }
         )
@@ -351,7 +351,7 @@ $TreeView.Add_SelectedItemChanged({
             Catch
             {
                 $Customerror = $_.Exception.Message.Replace('"',"'")
-                New-WPFMessageBox -Title "SQL Error" -Content $Customerror -BorderThickness 1 -BorderBrush Red -Sound 'Windows Error' -TitleBackground Red -TitleTextForeground GhostWhite -TitleFontWeight Bold -TitleFontSize 20
+                Show-WpfMessageBox -Title "SQL Error" -Content $Customerror -BorderThickness 1 -BorderBrush Red -Sound 'Windows Error' -TitleBackground Red -TitleTextForeground GhostWhite -TitleFontWeight Bold -TitleFontSize 20
                 Return
             }
         )
@@ -377,15 +377,15 @@ $List.Add_MouseDoubleClick({
     $UI.SelectedCollection = $This.SelectedItem.Content
     Try
     {
-        Populate-CollectionInfo -ErrorAction Stop
+        Get-CollectionInfo -ErrorAction Stop
     }
     Catch
     {
         $Customerror = $_.Exception.Message.Replace('"',"'")
-        New-WPFMessageBox -Title "SQL Error" -Content $Customerror -BorderThickness 1 -BorderBrush Red -Sound 'Windows Error' -TitleBackground Red -TitleTextForeground GhostWhite -TitleFontWeight Bold -TitleFontSize 20
+        Show-WpfMessageBox -Title "SQL Error" -Content $Customerror -BorderThickness 1 -BorderBrush Red -Sound 'Windows Error' -TitleBackground Red -TitleTextForeground GhostWhite -TitleFontWeight Bold -TitleFontSize 20
         Return
     }
-    
+
 })
 
 # Add the user and device collection nodes at top level
@@ -448,7 +448,7 @@ Try
 Catch
 {
     $Customerror = $_.Exception.Message.Replace('"',"'")
-    New-WPFMessageBox -Title "SQL Error" -Content $Customerror -BorderThickness 1 -BorderBrush Red -Sound 'Windows Error' -TitleBackground Red -TitleTextForeground GhostWhite -TitleFontWeight Bold -TitleFontSize 20
+    Show-WpfMessageBox -Title "SQL Error" -Content $Customerror -BorderThickness 1 -BorderBrush Red -Sound 'Windows Error' -TitleBackground Red -TitleTextForeground GhostWhite -TitleFontWeight Bold -TitleFontSize 20
     Return
 }
 
@@ -468,7 +468,7 @@ Try
 Catch
 {
     $Customerror = $_.Exception.Message.Replace('"',"'")
-    New-WPFMessageBox -Title "SQL Error" -Content $Customerror -BorderThickness 1 -BorderBrush Red -Sound 'Windows Error' -TitleBackground Red -TitleTextForeground GhostWhite -TitleFontWeight Bold -TitleFontSize 20
+    Show-WpfMessageBox -Title "SQL Error" -Content $Customerror -BorderThickness 1 -BorderBrush Red -Sound 'Windows Error' -TitleBackground Red -TitleTextForeground GhostWhite -TitleFontWeight Bold -TitleFontSize 20
     Return
 }
 
@@ -488,7 +488,7 @@ If ($UserContainers)
         Catch
         {
             $Customerror = $_.Exception.Message.Replace('"',"'")
-            New-WPFMessageBox -Title "SQL Error" -Content $Customerror -BorderThickness 1 -BorderBrush Red -Sound 'Windows Error' -TitleBackground Red -TitleTextForeground GhostWhite -TitleFontWeight Bold -TitleFontSize 20
+            Show-WpfMessageBox -Title "SQL Error" -Content $Customerror -BorderThickness 1 -BorderBrush Red -Sound 'Windows Error' -TitleBackground Red -TitleTextForeground GhostWhite -TitleFontWeight Bold -TitleFontSize 20
             Return
         }
 
@@ -497,7 +497,7 @@ If ($UserContainers)
             Foreach ($Row in $UserSubContainers)
             {
                 $UserTreeViewItem2 = Add-TreeViewItem -Text $Row.Name -ImageSource "$source\bin\Icon0.bmp" -Tag $Row.FolderPath -Parent $UserTreeViewItem1 -CollectionType 1
-                
+
                 Try
                 {
                     $UserSubContainers1 = Query-SubContainers -ParentContainerNodeID $Row.ContainerNodeID -ErrorAction Stop
@@ -505,7 +505,7 @@ If ($UserContainers)
                 Catch
                 {
                     $Customerror = $_.Exception.Message.Replace('"',"'")
-                    New-WPFMessageBox -Title "SQL Error" -Content $Customerror -BorderThickness 1 -BorderBrush Red -Sound 'Windows Error' -TitleBackground Red -TitleTextForeground GhostWhite -TitleFontWeight Bold -TitleFontSize 20
+                    Show-WpfMessageBox -Title "SQL Error" -Content $Customerror -BorderThickness 1 -BorderBrush Red -Sound 'Windows Error' -TitleBackground Red -TitleTextForeground GhostWhite -TitleFontWeight Bold -TitleFontSize 20
                     Return
                 }
 
@@ -514,7 +514,7 @@ If ($UserContainers)
                     Foreach ($Row in $UserSubContainers1)
                     {
                         $UserTreeViewItem3 = Add-TreeViewItem -Text $Row.Name -ImageSource "$source\bin\Icon0.bmp" -Tag $Row.FolderPath -Parent $UserTreeViewItem2 -CollectionType 1
-                        
+
                         Try
                         {
                             $UserSubContainers2 = Query-SubContainers -ParentContainerNodeID $Row.ContainerNodeID -ErrorAction Stop
@@ -522,7 +522,7 @@ If ($UserContainers)
                         Catch
                         {
                             $Customerror = $_.Exception.Message.Replace('"',"'")
-                            New-WPFMessageBox -Title "SQL Error" -Content $Customerror -BorderThickness 1 -BorderBrush Red -Sound 'Windows Error' -TitleBackground Red -TitleTextForeground GhostWhite -TitleFontWeight Bold -TitleFontSize 20
+                            Show-WpfMessageBox -Title "SQL Error" -Content $Customerror -BorderThickness 1 -BorderBrush Red -Sound 'Windows Error' -TitleBackground Red -TitleTextForeground GhostWhite -TitleFontWeight Bold -TitleFontSize 20
                             Return
                         }
 
@@ -531,7 +531,7 @@ If ($UserContainers)
                             Foreach ($Row in $UserSubContainers2)
                             {
                                 $UserTreeViewItem4 = Add-TreeViewItem -Text $Row.Name -ImageSource "$source\bin\Icon0.bmp" -Tag $Row.FolderPath -Parent $UserTreeViewItem3 -CollectionType 1
-                                
+
                                 Try
                                 {
                                     $UserSubContainers3 = Query-SubContainers -ParentContainerNodeID $Row.ContainerNodeID -ErrorAction Stop
@@ -539,7 +539,7 @@ If ($UserContainers)
                                 Catch
                                 {
                                     $Customerror = $_.Exception.Message.Replace('"',"'")
-                                    New-WPFMessageBox -Title "SQL Error" -Content $Customerror -BorderThickness 1 -BorderBrush Red -Sound 'Windows Error' -TitleBackground Red -TitleTextForeground GhostWhite -TitleFontWeight Bold -TitleFontSize 20
+                                    Show-WpfMessageBox -Title "SQL Error" -Content $Customerror -BorderThickness 1 -BorderBrush Red -Sound 'Windows Error' -TitleBackground Red -TitleTextForeground GhostWhite -TitleFontWeight Bold -TitleFontSize 20
                                     Return
                                 }
 
@@ -547,13 +547,13 @@ If ($UserContainers)
                                 {
                                     Foreach ($Row in $UserSubContainers3)
                                     {
-                                        $UserTreeViewItem5 = Add-TreeViewItem -Text $Row.Name -ImageSource "$source\bin\Icon0.bmp" -Tag $Row.FolderPath -Parent $UserTreeViewItem4 -CollectionType 1             
+                                        $UserTreeViewItem5 = Add-TreeViewItem -Text $Row.Name -ImageSource "$source\bin\Icon0.bmp" -Tag $Row.FolderPath -Parent $UserTreeViewItem4 -CollectionType 1
                                     }
-                                }               
+                                }
                             }
-                        }               
+                        }
                     }
-                }              
+                }
             }
         }
     }
@@ -573,7 +573,7 @@ If ($DeviceContainers)
         Catch
         {
             $Customerror = $_.Exception.Message.Replace('"',"'")
-            New-WPFMessageBox -Title "SQL Error" -Content $Customerror -BorderThickness 1 -BorderBrush Red -Sound 'Windows Error' -TitleBackground Red -TitleTextForeground GhostWhite -TitleFontWeight Bold -TitleFontSize 20
+            Show-WpfMessageBox -Title "SQL Error" -Content $Customerror -BorderThickness 1 -BorderBrush Red -Sound 'Windows Error' -TitleBackground Red -TitleTextForeground GhostWhite -TitleFontWeight Bold -TitleFontSize 20
             Return
         }
 
@@ -582,7 +582,7 @@ If ($DeviceContainers)
             Foreach ($Row in $DeviceSubContainers1)
             {
                 $DevicesTreeViewItem2 = Add-TreeViewItem -Text $Row.Name -ImageSource "$source\bin\Icon0.bmp" -Tag $Row.FolderPath -Parent $DevicesTreeViewItem1 -CollectionType 2
-                
+
                 Try
                 {
                     $DeviceSubContainers2 = Query-SubContainers -ParentContainerNodeID $Row.ContainerNodeID -ErrorAction Stop
@@ -590,7 +590,7 @@ If ($DeviceContainers)
                 Catch
                 {
                     $Customerror = $_.Exception.Message.Replace('"',"'")
-                    New-WPFMessageBox -Title "SQL Error" -Content $Customerror -BorderThickness 1 -BorderBrush Red -Sound 'Windows Error' -TitleBackground Red -TitleTextForeground GhostWhite -TitleFontWeight Bold -TitleFontSize 20
+                    Show-WpfMessageBox -Title "SQL Error" -Content $Customerror -BorderThickness 1 -BorderBrush Red -Sound 'Windows Error' -TitleBackground Red -TitleTextForeground GhostWhite -TitleFontWeight Bold -TitleFontSize 20
                     Return
                 }
 
@@ -599,7 +599,7 @@ If ($DeviceContainers)
                     Foreach ($Row in $DeviceSubContainers2)
                     {
                         $DevicesTreeViewItem3 = Add-TreeViewItem -Text $Row.Name -ImageSource "$source\bin\Icon0.bmp" -Tag $Row.FolderPath -Parent $DevicesTreeViewItem2 -CollectionType 2
-                        
+
                         Try
                         {
                             $DeviceSubContainers3 = Query-SubContainers -ParentContainerNodeID $Row.ContainerNodeID -ErrorAction Stop
@@ -607,7 +607,7 @@ If ($DeviceContainers)
                         Catch
                         {
                             $Customerror = $_.Exception.Message.Replace('"',"'")
-                            New-WPFMessageBox -Title "SQL Error" -Content $Customerror -BorderThickness 1 -BorderBrush Red -Sound 'Windows Error' -TitleBackground Red -TitleTextForeground GhostWhite -TitleFontWeight Bold -TitleFontSize 20
+                            Show-WpfMessageBox -Title "SQL Error" -Content $Customerror -BorderThickness 1 -BorderBrush Red -Sound 'Windows Error' -TitleBackground Red -TitleTextForeground GhostWhite -TitleFontWeight Bold -TitleFontSize 20
                             Return
                         }
 
@@ -616,7 +616,7 @@ If ($DeviceContainers)
                             Foreach ($Row in $DeviceSubContainers3)
                             {
                                 $DevicesTreeViewItem4 = Add-TreeViewItem -Text $Row.Name -ImageSource "$source\bin\Icon0.bmp" -Tag $Row.FolderPath -Parent $DevicesTreeViewItem3 -CollectionType 2
-                                
+
                                 Try
                                 {
                                     $DeviceSubContainers4 = Query-SubContainers -ParentContainerNodeID $Row.ContainerNodeID -ErrorAction Stop
@@ -624,7 +624,7 @@ If ($DeviceContainers)
                                 Catch
                                 {
                                     $Customerror = $_.Exception.Message.Replace('"',"'")
-                                    New-WPFMessageBox -Title "SQL Error" -Content $Customerror -BorderThickness 1 -BorderBrush Red -Sound 'Windows Error' -TitleBackground Red -TitleTextForeground GhostWhite -TitleFontWeight Bold -TitleFontSize 20
+                                    Show-WpfMessageBox -Title "SQL Error" -Content $Customerror -BorderThickness 1 -BorderBrush Red -Sound 'Windows Error' -TitleBackground Red -TitleTextForeground GhostWhite -TitleFontWeight Bold -TitleFontSize 20
                                     Return
                                 }
 
@@ -632,13 +632,13 @@ If ($DeviceContainers)
                                 {
                                     Foreach ($Row in $DeviceSubContainers4)
                                     {
-                                        $DevicesTreeViewItem5 = Add-TreeViewItem -Text $Row.Name -ImageSource "$source\bin\Icon0.bmp" -Tag $Row.FolderPath -Parent $DevicesTreeViewItem4 -CollectionType 2              
+                                        $DevicesTreeViewItem5 = Add-TreeViewItem -Text $Row.Name -ImageSource "$source\bin\Icon0.bmp" -Tag $Row.FolderPath -Parent $DevicesTreeViewItem4 -CollectionType 2
                                     }
-                                }               
+                                }
                             }
-                        }               
+                        }
                     }
-                }              
+                }
             }
         }
     }

@@ -1,10 +1,10 @@
 ﻿$UI.Window.Add_Loaded({
     $This.Activate()
     # Create registry keys in the CU hive if they don't exist
-    Create-RegistryKeys
+    Add-RegSetting
 
     # Read the registry keys
-    Read-Registry
+    Read-RegSetting
 
 
     # If we have a SQL server and database...
@@ -13,9 +13,9 @@
         # Check if new version is available in a background job
         $Code = {
             Param($UI)
-            Check-CurrentVersion -UI $UI
+            Test-UpdateAvailable -UI $UI
         }
-        $Job = [BackgroundJob]::new($Code,@($UI),@("Function:\Check-CurrentVersion","Function:\Show-BalloonTip"))
+        $Job = [BackgroundJob]::new($Code,@($UI),@("Function:\Test-UpdateAvailable","Function:\Show-BalloonTip"))
         $UI.Jobs += $Job
         $Job.Start()
     }
@@ -30,12 +30,12 @@ $UI.SelectCollection.Add_Click({
 $UI.Populate.Add_Click({
     Try
     {
-        Populate-Members -ErrorAction Stop
+        Get-CollectionMembers -ErrorAction Stop
     }
     Catch
     {
         $Customerror = $_.Exception.Message.Replace('"',"'")
-        New-WPFMessageBox -Title "SQL Error" -Content $Customerror -BorderThickness 1 -BorderBrush Red -Sound 'Windows Error' -TitleBackground Red -TitleTextForeground GhostWhite -TitleFontWeight Bold -TitleFontSize 20
+        Show-WpfMessageBox -Title "SQL Error" -Content $Customerror -BorderThickness 1 -BorderBrush Red -Sound 'Windows Error' -TitleBackground Red -TitleTextForeground GhostWhite -TitleFontWeight Bold -TitleFontSize 20
         Return
     }
 
@@ -91,22 +91,22 @@ $UI.AddResources.Add_Click({
     Catch
     {
         $Customerror = $_.Exception.Message.Replace('"',"'")
-        New-WPFMessageBox -Title "SQL Error" -Content $Customerror -BorderThickness 1 -BorderBrush Red -Sound 'Windows Error' -TitleBackground Red -TitleTextForeground GhostWhite -TitleFontWeight Bold -TitleFontSize 20
+        Show-WpfMessageBox -Title "SQL Error" -Content $Customerror -BorderThickness 1 -BorderBrush Red -Sound 'Windows Error' -TitleBackground Red -TitleTextForeground GhostWhite -TitleFontWeight Bold -TitleFontSize 20
         Return
     }
 
 })
 
 $UI.Btn_Settings.Add_Click({
-    Get-Settings
+    Show-SettingsView
 })
 
 $UI.Btn_About.Add_Click({
-    Display-About
+    Show-AboutView
 })
 
 $UI.Btn_Help.Add_Click({
-    Display-Help
+    Show-HelpView
 })
 
 $UI.Btn_Exit.Add_Click({
